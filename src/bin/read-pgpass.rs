@@ -93,7 +93,7 @@ fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: 
 
     //println!("pgpass_entries {:?}", pgpass_entries);
 
-    pgpass_entries.iter().find(|&x| x.hostname == hostname
+    pgpass_entries.into_iter().find(|x| x.hostname == hostname
                                                         && x.database == database
                                                         && x.port == port
                                                         && x.username == username)
