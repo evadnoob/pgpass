@@ -1,0 +1,7 @@
+[package]
+name = "read-pgpass"
+version = "0.1.0"
+authors = ["David Boon <david.boon@gmail.com>"]
+
+[dependencies]
+regex = "*"
