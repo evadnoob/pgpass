@@ -8,12 +8,12 @@ use std::io::prelude::*;
 use regex::Regex;
 
 #[derive(Debug, Clone)]
-struct PgPassEntry<'a> {
-    username: &'a str,
-    hostname: &'a str,
-    port: &'a str,
-    database: &'a str,
-    password: &'a str
+struct PgPassEntry {
+    username: String,
+    hostname: String,
+    port: String,
+    database: String,
+    password: String
 }
 
  fn main() {
@@ -33,7 +33,7 @@ struct PgPassEntry<'a> {
     }
  }
 
-fn read_pgpass_file<'a>(path_to_pgpass: &str, username: &str, hostname: &str, port: &str, database: &str) -> Option<&'a PgPassEntry<'a>> {
+fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: &str, database: &str) -> Option<PgPassEntry> {
 
     let path = Path::new(path_to_pgpass);
     let display = path.display();
@@ -79,11 +79,11 @@ fn read_pgpass_file<'a>(path_to_pgpass: &str, username: &str, hostname: &str, po
                 println!("parts_vec {:?}", parts_vec);
 
                 pgpass_entries.push(PgPassEntry{
-                    hostname: &host,
-                    port: &port,
-                    username: &username,
-                    database: &database,
-                    password:  &password});
+                    hostname: String::from(host),
+                    port: String::from(port),
+                    username: String::from(username),
+                    database: String::from(database),
+                    password:  String::from(password)});
 
                 
             },
