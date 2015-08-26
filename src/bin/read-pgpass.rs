@@ -24,7 +24,7 @@ struct PgPassEntry {
     match env::args().last() {
         Some(arg) => {
             println!("arg {}", arg);
-            let pgpass_entry_match = read_pgpass_file("~/.pgpass", "auser", "a.host.name", "5432", "database");
+            let pgpass_entry_match = read_pgpass_file(&arg, "auser", "a.host.name", "5432", "database");
             println!("pgpass_entry_match {:?}", pgpass_entry_match);
         },
         _ => {
@@ -37,13 +37,13 @@ fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: 
 
     let path = Path::new(path_to_pgpass);
     let display = path.display();
-
+    println!("display {}", display);
     // Open the path in read-only mode, returns `io::Result<File>`
     let mut file = match File::open(&path) {
         // The `description` method of `io::Error` returns a string that
         // describes the error
-        Err(why) => panic!("couldn't open {}: {}", display,
-                           Error::description(&why)),
+        Err(why) => panic!("couldn't open {}: {}, {}", display,
+                           Error::description(&why), why),
         Ok(file) => file,
     };
 

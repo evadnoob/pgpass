@@ -19,3 +19,8 @@ error: aborting due to previous error
 Could not compile `read-pgpass`.
 
 ``
+
+The solution to that error was to make vec.into_iter() as vec.iter() only returns references.
+
+
+
