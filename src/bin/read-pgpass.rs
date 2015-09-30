@@ -1,12 +1,13 @@
 extern crate regex;
-
 use std::error::Error;
 use std::fs::File;
 use std::path::Path;
+use std::path::PathBuf;
 use std::env;
 use std::io::prelude::*;
 use regex::Regex;
-
+use std::fs;
+    
 #[derive(Debug, Clone)]
 struct PgPassEntry {
     username: String,
@@ -16,24 +17,63 @@ struct PgPassEntry {
     password: String
 }
 
- fn main() {
+impl PgPassEntry {
+    pub fn to_string(&self) -> String {
+        format!("postgresql://user@hostname:port/{}", self.database)
+    }
+}
+
+fn main() {
     for argument in env::args() {
         println!("{}", argument);
     }
+
+    let pgpass_file = env::args().nth(1).unwrap();
+    //let user = env::args().nth(2).unwrap();
+    let connect_str = env::args().nth(2).unwrap();
     
+    println!("{} {}", pgpass_file, connect_str);
     match env::args().last() {
         Some(arg) => {
             println!("arg {}", arg);
-            let pgpass_entry_match = read_pgpass_file(&arg, "auser", "a.host.name", "5432", "database");
-            println!("pgpass_entry_match {:?}", pgpass_entry_match);
+            //let pgpass_entry_match = read_pgpass_file(&pgpass_file, &user, "dbcore.dev.porch.com", "5434", "application_data");
+            match get_path_to_pgpass() {
+                Ok(path_to_pgpass) => { 
+                    let pgpass_entry_match = read_pgpass_file(&path_to_pgpass.as_path(), &connect_str);
+                    println!("pgpass_entry_match {:?}", pgpass_entry_match);
+                },
+                Err(e) => println!("uh oh {}", e)
+            }
         },
         _ => {
             println!("missing required command line arguments.")
         }
     }
- }
+}
 
-fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: &str, database: &str) -> Option<PgPassEntry> {
+fn get_path_to_pgpass() -> Result<PathBuf, String> {
+
+    let home_dir = env::home_dir().expect("unable to exract home environment variable.");
+    println!("home_dir {:?}", home_dir);
+
+    let mut path_to_pgpass = PathBuf::from(home_dir);
+    path_to_pgpass.push(".pgpass");
+    println!("path_to_pg_pass {:?}", path_to_pgpass);
+    match fs::metadata(&path_to_pgpass) {
+        Ok(md) => {
+            println!("metdata {}", md.is_file());
+            //let path_to_pgpass_as_path = &path_to_pgpass.as_path();
+            Ok(path_to_pgpass)
+        },
+        Err(e) => {
+            println!("{}", e);
+            Err("unable to read .pgpass file".to_string())
+        }
+    }
+}
+
+//fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: &str, database: &str) -> Option<PgPassEntry> {
+fn read_pgpass_file(path_to_pgpass: &Path, connection_string: &str) -> Option<PgPassEntry> {
 
     let path = Path::new(path_to_pgpass);
     let display = path.display();
@@ -58,7 +98,7 @@ fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: 
         match line {
             Ok(ref l) => {
                 let mut parts = re.split(l);
-        
+                
                 let host = parts.next().unwrap();
                 println!("parts[0] {:?}", host);
 
@@ -93,8 +133,13 @@ fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: 
 
     //println!("pgpass_entries {:?}", pgpass_entries);
 
-    pgpass_entries.into_iter().find(|x| x.hostname == hostname
-                                                        && x.database == database
-                                                        && x.port == port
-                                                        && x.username == username)
+    // pgpass_entries.into_iter().find(|x| x.hostname == hostname
+    //                                 && x.database == database
+    //                                 && x.port == port
+    //                                 && x.username == username)
+
+           pgpass_entries.into_iter().find(|x|
+                                    format!("postgresql://{}@{}:{}/{}", x.username, x.hostname, x.port, x.database) == connection_string)
+
+        
 }
