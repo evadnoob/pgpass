@@ -53,7 +53,6 @@ fn get_path_to_pgpass() -> Result<PathBuf, String> {
     match fs::metadata(&path_to_pgpass) {
         Ok(md) => {
             println!("metdata {}", md.is_file());
-            //let path_to_pgpass_as_path = &path_to_pgpass.as_path();
             Ok(path_to_pgpass)
         },
         Err(e) => {
@@ -68,10 +67,7 @@ fn read_pgpass_file(path_to_pgpass: &Path, connection_string: &str) -> Option<Pg
     let path = Path::new(path_to_pgpass);
     let display = path.display();
     println!("display {}", display);
-    // Open the path in read-only mode, returns `io::Result<File>`
     let mut file = match File::open(&path) {
-        // The `description` method of `io::Error` returns a string that
-        // describes the error
         Err(why) => panic!("couldn't open {}: {}, {}", display,
                            Error::description(&why), why),
         Ok(file) => file,
@@ -121,14 +117,7 @@ fn read_pgpass_file(path_to_pgpass: &Path, connection_string: &str) -> Option<Pg
         }
     }
 
-    //println!("pgpass_entries {:?}", pgpass_entries);
-
-    // pgpass_entries.into_iter().find(|x| x.hostname == hostname
-    //                                 && x.database == database
-    //                                 && x.port == port
-    //                                 && x.username == username)
-
-           pgpass_entries.into_iter().find(|x|
+    pgpass_entries.into_iter().find(|x|
                                     format!("postgresql://{}@{}:{}/{}", x.username, x.hostname, x.port, x.database) == connection_string)
 
         
@@ -140,10 +129,7 @@ fn it_works() {
     match std::env::current_exe() {
         Ok(exe_path) => {
             println!("Path of this executable is: {}", exe_path.display());
-            //expect a test file in the current directory
 
-                //let pgpass_file = exe_path
-                //let connect_str = "postgresql://user1@localhost:5432/database1".to_string();
             let x = find_matching_pgpass_entry("postgresql://user1@localhost:5432/database1".to_string(), Some("./pgpass_test_data".to_string()));
             println!("x: {:?}", x);
             
