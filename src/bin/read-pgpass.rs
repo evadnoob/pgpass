@@ -24,10 +24,6 @@ impl PgPassEntry {
 }
 
 fn main() {
-    for argument in env::args() {
-        println!("{}", argument);
-    }
-
     let pgpass_file = env::args().nth(1).unwrap();
     //let user = env::args().nth(2).unwrap();
     let connect_str = env::args().nth(2).unwrap();
@@ -48,6 +44,16 @@ fn main() {
         _ => {
             println!("missing required command line arguments.")
         }
+    }
+}
+
+pub fn find_matching_pgpass_entry(connect_str: String, pgpass_path_override: String) {
+    match get_path_to_pgpass() {
+        Ok(path_to_pgpass) => { 
+            let pgpass_entry_match = read_pgpass_file(&path_to_pgpass.as_path(), &connect_str);
+            println!("pgpass_entry_match {:?}", pgpass_entry_match);
+        },
+        Err(e) => println!("uh oh {}", e)
     }
 }
 
