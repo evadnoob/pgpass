@@ -63,7 +63,6 @@ fn get_path_to_pgpass() -> Result<PathBuf, String> {
     }
 }
 
-//fn read_pgpass_file(path_to_pgpass: &str, username: &str, hostname: &str, port: &str, database: &str) -> Option<PgPassEntry> {
 fn read_pgpass_file(path_to_pgpass: &Path, connection_string: &str) -> Option<PgPassEntry> {
 
     let path = Path::new(path_to_pgpass);
