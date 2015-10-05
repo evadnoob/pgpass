@@ -23,7 +23,7 @@ impl PgPassEntry {
     }
 }
 
-pub fn find_matching_pgpass_entry(connect_str: String, override_path_to_pgpass: Option<String>) {
+pub fn find_matching_pgpass_entry(connect_str: &str, override_path_to_pgpass: Option<String>) {
     println!("override_path_to_pg_pass: {:?}", override_path_to_pgpass);
 
     let path_to_pgpass: Result<PathBuf, String> = match override_path_to_pgpass {
@@ -130,7 +130,7 @@ fn it_works() {
         Ok(exe_path) => {
             println!("Path of this executable is: {}", exe_path.display());
 
-            let x = find_matching_pgpass_entry("postgresql://user1@localhost:5432/database1".to_string(), Some("./pgpass_test_data".to_string()));
+            let x = find_matching_pgpass_entry("postgresql://user1@localhost:5432/database1", Some("./pgpass_test_data".to_string()));
             println!("x: {:?}", x);
             
         },
